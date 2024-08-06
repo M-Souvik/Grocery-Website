@@ -5,10 +5,14 @@ import { ListRestart } from 'lucide-react';
 import { Handshake } from 'lucide-react';
 import { Headset } from 'lucide-react';
 import Products from "./products/page";
-import Categories from "@/components/categories/Categories";
+import Categories from "@/app/categories/Categories";
 import Offer from "./Offer/page";
 import Testimonials from "@/components/Testimonials";
-export default function Home() {
+import GlobalApi from "@/utils/GlobalApi";
+
+export default async function Home() {
+  const getProduct = await GlobalApi.getProduct();
+
   return (
     <>
     <div className="flex justify-center items-center px-4 ">
@@ -54,7 +58,7 @@ export default function Home() {
      <div>
       <h1 className="text-2xl text-left font-bold">Deal of the Day</h1>
       <div className="p-2">
-      <Products/>
+      <Products getProduct={getProduct}/>
       </div>
       
      </div>
