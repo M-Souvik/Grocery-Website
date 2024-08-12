@@ -12,6 +12,7 @@ import {
 const Products = ({getProduct}) => {
   return (
     <>
+    
     <div className="container py-2">
     <Carousel>
         <CarouselContent className="p-3">

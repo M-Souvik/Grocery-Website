@@ -19,7 +19,7 @@ export default async function Home() {
     <CarouselSlider/>
     </div>
      
-    <div className="flex min-h-screen flex-col gap-6 px-28 py-10">
+    <div className="flex min-h-screen flex-col gap-6 px-10 sm:px-28 py-10">
      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
 
      <div className="rounded-md p-5 flex justify-center items-center gap-3 bg-green-200">
@@ -55,9 +55,9 @@ export default async function Home() {
      </div>
      </div>
     
-     <div>
+     <div >
       <h1 className="text-2xl text-left font-bold">Deal of the Day</h1>
-      <div className="p-2">
+      <div className="">
       <Products getProduct={getProduct}/>
       </div>
       
