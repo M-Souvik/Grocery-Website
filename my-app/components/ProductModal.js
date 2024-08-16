@@ -56,16 +56,18 @@ const ProductModal = ({ product }) => {
         GlobalApi.AddToCart(data,jwt).then((response)=>{
             console.log(response);
             toast({
+                variant: "success",
                 title:'Added to Cart'
             })
             setUpdateCart(!updateCart);
             setLoading(false);
-        }).catch=(e)=>{
+        }).catch((e)=>{
             toast({
-                title:'Error while while adding to cart'
+                variant: "destructive",
+                title:'Error while adding to cart'
             })
             setLoading(false);
-        }
+        });
     }
     return (
         <>

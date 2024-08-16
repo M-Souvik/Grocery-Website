@@ -35,6 +35,7 @@ const SignUp = () => {
            sessionStorage.setItem("jwt",JSON.stringify(response.data.jwt));
             router.push('/SignIn')
             toast({
+                variant: "success",
                 description: "Account Successfully Created",
               })
         }).catch((err)=>{

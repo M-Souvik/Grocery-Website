@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      animation: {
+        'animate-ping-slow': 'ping 5s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { UserCircleIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
-import { ArrowBigRight, HomeIcon, Search } from 'lucide-react'
+import { ArrowBigRight, HomeIcon, IndianRupee, Search } from 'lucide-react'
 import Link from 'next/link'
 import {
   DropdownMenu,
@@ -25,11 +25,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button'
 import { RiOrderPlayFill } from 'react-icons/ri'
+import { MdOutlineShoppingCartCheckout } from "react-icons/md";
 import { useRouter } from 'next/navigation'
 import GlobalApi from '@/utils/GlobalApi'
 import { UpdateCartContext } from '@/context/UpdateCartContext'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -37,13 +39,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import CartCard from './CartCard'
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
+import { useToast } from './ui/use-toast'
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [totalCartItem, setTotalCartItem]=useState(0);
   const [CartItemList, setCartItemList]=useState([]);
   const {updateCart, setUpdateCart} = useContext(UpdateCartContext)
-
+  const [total, setTotal] = useState(0);
+  const {toast}=useToast();
+  const { setTheme } = useTheme();
   const router=useRouter();
 
   const user=JSON.parse(sessionStorage.getItem("user"));
@@ -62,9 +69,28 @@ export default function Nav() {
     setCartItemList(cartItemsList_)
   }
 
+  const onDeleteItem=(id)=>{
+    GlobalApi.deleteCartItem(id,jwt).then(response=>{
+      toast({
+        variant:"success",
+        title:"Item Removed"
+      })
+      getCartItems();
+    })
+
+
+  }
 useEffect(() => {
 getCartItems();
 }, [updateCart])
+
+useEffect(() => {
+let total=0;
+CartItemList.forEach((element)=>{
+  total=total+element.amount
+});
+setTotal(total)
+}, [CartItemList])
 
   return (
     <header className="bg-transparent sticky top-0 z-50 backdrop-blur-md">
@@ -100,6 +126,28 @@ getCartItems();
           
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-3">
+          <div className=" flex items-center justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          </div>
           <div className="bg-gray-200 p-2 rounded-full flex items-center justify-center">
             <Search className="cursor-pointer hover:scale-110 transition-all duration-300" width={30} color='black'/>
           </div>
@@ -119,7 +167,7 @@ getCartItems();
                               <Link href="/" className='flex items-center gap-2'>Home <HomeIcon size={20} color='grey'/></Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                              <Link href="/Order" className='flex items-center gap-2'>My Orders <RiOrderPlayFill size={20} color='grey'/></Link>
+                              <Link href="/my-order" className='flex items-center gap-2'>My Orders <RiOrderPlayFill size={20} color='grey'/></Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="flex items-center text-slate-600"  onClick={handleLogOut}>Logout <ArrowBigRight size={20} color='grey'/></DropdownMenuItem>
 
@@ -139,15 +187,23 @@ getCartItems();
               <SheetContent className="custom-scrollbar">
                 <SheetHeader>
                   <SheetTitle className="text-xl text-green-600">Add To Cart</SheetTitle>
-                  <div className="flex flex-col gap-2 overflow-y-auto max-h-[45rem]">
+                  <div className="flex flex-col gap-2 overflow-y-auto max-h-[39rem]">
                   
                     {CartItemList?.map((item, index) => {
                       return (
-                          <CartCard item={item}  key={index}/>
+                          <CartCard item={item}  key={index} onDeleteItem={onDeleteItem}/>
                       )
                     })}
                   </div>
+                    
                 </SheetHeader>
+                <SheetClose className='hover:border-none w-full'>
+                    <div className="flex justify-between">
+                      <h1 className="text-lg text-green-600">Total Amount:</h1>
+                      <h1 className="text-lg font-semibold flex justify-center items-center"><IndianRupee size={20}/>{total}</h1>
+                    </div>
+                    <Button className="w-full active:translate-y-1 bg-green-600 hover:bg-green-500 transition"><span className='flex gap-2' onClick={()=>(jwt ? router.push('/checkout'):router.push('/SignIn'))}><MdOutlineShoppingCartCheckout size={20}/>CheckOut</span></Button>
+              </SheetClose>
               </SheetContent>
             </Sheet>
 

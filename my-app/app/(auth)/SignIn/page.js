@@ -22,6 +22,7 @@ const SignIn = () => {
             sessionStorage.setItem("jwt",response.data.jwt);
              router.push('/')
              toast({
+                variant: "success",
                  title: "Login Successfully",
                })
                setLoader(false);

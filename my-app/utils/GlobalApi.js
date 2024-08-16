@@ -28,6 +28,12 @@ const AddToCart=(data, jwt)=>axiosClient.post('/user-carts', data,{
     }
 })
 
+const addBillingDetails=(data,jwt)=>axiosClient.post("/billing-details",data,{
+    headers:{
+        Authorization:'Bearer '+jwt
+    }
+})
+
 const getCartItems=(userId, jwt)=>axiosClient.get(`/user-carts?filters[userId][$eq]=${userId}&[populate][products][populate][Image][populate][0]=url`,{
     headers:{
         Authorization:'Bearer '+jwt
@@ -35,16 +41,47 @@ const getCartItems=(userId, jwt)=>axiosClient.get(`/user-carts?filters[userId][$
 }).then((response)=>{
     const data = response.data.data;
     const cartItemsList=data.map((item,index)=>({
-    name: item.attributes.products?.data[0]?.attributes.name,
-    quantity: item.attributes.products?.quantity,
-    amount: item.attributes.amount,
-    image: item.attributes.products?.data[0]?.attributes.Image?.data[0]?.attributes.url,
+    name: item?.attributes?.products?.data[0]?.attributes?.title,
+    quantity: item?.attributes?.quantity,
+    amount:item?.attributes?.amount,
+    image: item?.attributes?.products?.data[0]?.attributes?.Image?.data?.attributes?.url,
     actualPrice: item.attributes.products?.data[0]?.attributes.Price,
-    id: item.id
+    id: item.id,
+    product:item?.attributes?.products?.data[0]?.id
     }))
-    return response.data.data;
+    return cartItemsList;
 });
 console.log(getCartItems)
 
+const deleteCartItem=(id,jwt)=>axiosClient.delete('/user-carts/'+id,{
+    headers:{
+        Authorization:'Bearer '+jwt
+    }
+})
 
-export default {getCategory, getProduct, getFilteredCategory, RegisterUser, signIn, AddToCart,getCartItems};
+
+
+const createOrder=(data,jwt)=>axiosClient.post('/orders',data,{
+    headers:{
+        Authorization:'Bearer '+jwt
+    }
+})
+
+const getMyOrder=(userId,jwt)=>axiosClient.get(`/orders?filters[userId][$eq]=${userId}&populate[OrderedItemList][populate][product][populate][Image]=url`,{
+    headers:{
+        Authorization:'Bearer '+jwt
+    }
+}).then((response)=>{
+    const data = response.data.data;
+    const OrderList=data.map((order)=>({
+    orderId:order?.id,
+    orderDate:order?.attributes?.createdAt,
+    orderAmt:order?.attributes?.OrderAmt,
+    orderItemList:order?.attributes?.OrderedItemList,
+    paymentId:order?.attributes?.paymentId
+    
+    }))
+    return OrderList;
+})
+
+export default {getCategory, getProduct, getFilteredCategory, RegisterUser, signIn, AddToCart,getCartItems,deleteCartItem,createOrder,getMyOrder};
